@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Gathering calculator</title>
+        
+        <style>
+	
+	table {
+			font-family: Arial, Helvetica, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
+	}
+
+	td,th {
+			border: 1px solid #ddd;
+			padding: 4px;
+			text-align: left;
+	}
+	
+	tr:nth-child(even) {
+		background-color: #f2f2f2;
+	}
+	
+	tr:hover {
+		background-color: #ddd;
+	}
+	
+	th {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		text-align: left;
+		background-color: #4e6078;
+		color: white;
+	}
+	  
+   </style>
+    </head>
+<body>
+
+<h1>Gathering</h1>
+
+<form action="">
+
+<div style="width:650px;">
+   <fieldset>
+      <legend style="color:blue;font-weight:bold;">Research done</legend>
+      
+
+		  <input type="checkbox" id="1" name="supervalue3" value="150" onchange="selecttherest(this)">
+		  <label for="supervalue3"> supervalue 3</label><br>
+		  
+		  <input type="checkbox" id="2"  name="insentivegathering" value="150" onchange="selecttherest(this)">
+		  <label for="insentivegathering"> insentive gathering</label><br>
+		  
+		  <input type="checkbox" id="3" name="supervalue2" value="100" onchange="selecttherest(this)">
+		  <label for="supervalue2"> supervalue 2</label><br>
+		  
+		  <input type="checkbox" id="4"  name="unexpectedprank"value="0" onchange="selecttherest(this)">
+		  <label for="unexpectedprank"> unexpected prank</label><br>
+		  
+		  <input type="checkbox" id="5" name="supervalue1" value="50" onchange="selecttherest(this)">
+		  <label for="supervalue1"> super value 1</label><br>
+	  </fieldset>
+ </div> 	  
+ <br>
+ 
+<div style="width:650px;">
+   <fieldset>
+      <legend style="color:blue;font-weight:bold;">Card used</legend>
+		  <label for="card">Card used:</label>
+		  <select id="card">
+			<option value="0">None</option>
+			<option value="50">50</option>
+			<option value="100">100</option>
+			<option value="200">200</option>
+		  </select>
+  
+    </fieldset>
+ </div>
+  
+  <br>
+  
+  <div style="width:650px;">
+   <fieldset>
+      <legend style="color:blue;font-weight:bold;">Items</legend>
+      
+			<label for="mine">Mine</label>
+			<select id="mine">
+				<option value="0">Iron</option>
+				<option value="1">Stone</option>
+				<option value="2">Zcoins</option>
+				<option value="3">Alloy</option>
+				<option value="4">Bauxite 11 complete</option>
+				<option value="5">Bauxite 10 complete</option>
+			</select>
+			<br><br>
+			
+			<div id="nobaux" style="display: block;">
+			
+				<input type="radio" checked name="tab" value="1" onclick="show1();" />Amount of time to complete
+				<input type="radio" name="tab" value="2" onclick="show2();" /> Start and end time
+				
+				<br><br>
+							
+				<div id="div1">
+				
+					<label for="mineload">mine load:</label>
+					<input type="text" id="mineload" maxlength="4" size="4"><br><br>
+					
+					<label>Amount of time complete mine (hours/minutes):</label>
+					<input type="text" id="timehh" maxlength="2" size="2"> / <input type="text" id="timemm" maxlength="2" size="2"><br><br>
+				
+				 </div>
+				
+				<div id="div2" style="display: none;">
+				
+				
+				
+					<label>Mining start Time (hh/mm GT):</label>
+					<input type="text" id="Starttimehh" maxlength="2" size="2"> / <input type="text" id="Starttimemm" maxlength="2" size="2"><br><br>
+					
+					<label>Mining Finish Time (hh/mm GT):</label>
+					<input type="text" id="Finishtimehh" maxlength="2" size="2"> / <input type="text" id="Finishtimemm" maxlength="2" size="2"><br><br>
+
+					<label for="mineSpeed">mine Speed:</label>
+					<input type="text" id="mineSpeed" maxlength="4" size="4"><br><br>
+				
+				</div>
+			
+			</div>
+			
+			 <button type="button" id="btn" onclick="addRow()"> Add new </button>
+  
+  </fieldset>
+ </div> 
+   
+</form>
+
+<div style="width:650px;">
+   <fieldset>
+      <legend style="color:blue;font-weight:bold;">cars/bauxite</legend>
+
+
+			 <table id="table">
+						<tr>
+							<th>item</th>
+							<th>type</th>
+							<th>rrs gathered</th>
+							<th>unit Value</th>
+							<th>time gathering</th>
+							<th>extra</th>
+							<th>multi</th>
+							<th>total gathered (with extra)</th>
+							<th>total mine points</th>
+						</tr>
+			</table>
+			<br><br>
+			
+			<p style="font-size:20px">Total points : </p> <p style="font-size:20px" id="totalpoints">0</p>
+
+  </fieldset>
+ </div> 
+
+
+ <script type="text/javascript">
+
+			
+				document.getElementById('mine').addEventListener('change', function () {
+					var style = ((this.value == 4)||(this.value == 5)) ? 'none':'block';
+					document.getElementById('nobaux').style.display = style;					
+
+				});
+            
+				
+				
+			//Funtion called when add button is clicked
+			function addRow(){
+			
+			 
+				var tabselected=document.querySelector('input[name="tab"]:checked').value;
+				var itemTable=1;				
+				var CalcpointsTotal=0;//all rss added
+				var multiplier=100; //research+cards+default
+				var subtotal=0; //one rss, before multiplier
+				var Calcpoints=0; //one rss,after multiplier
+				var extrarss=0; //iron or stone
+				var time_in_min=0; // calculate time in minutes
+				var rss_total=0; // gathered+ extra
+				var haveextra=false;
+				
+				//points given 
+				const ironpoints=45;
+				const goldpoints=60;
+				const stonepoints=30;
+				const alloypoints=80;
+				const bauxitepoints=1;
+				const bauxiteload11=150000;
+				const bauxiteload10=100000;
+		
+
+               // document.getElementById("table").style.display="block";
+                
+				
+                var table = document.getElementById("table");
+				var labtotal = document.getElementById("totalpoints");
+				
+				
+				//read Research done
+				
+				var supervalue3=document.getElementById(1);
+				var insentivegathering=document.getElementById(2);
+				var supervalue2=document.getElementById(3);
+				var unexpectedprank=document.getElementById(4);
+				var supervalue1=document.getElementById(5);
+				
+				
+				//read mine selected
+				var minetype=document.getElementById("mine");
+				var minetypeVal = minetype.value;
+				var minetypeText = minetype.options[minetype.selectedIndex].text;
+				
+				//read card selected
+				var cardType = parseInt(document.getElementById("card").value);
+				
+				//Read time,load,speed, init and finish time
+									
+				if((tabselected==1)&&(minetypeVal != 4)&&(minetypeVal != 5)){
+					var mineload=parseInt(document.getElementById('mineload').value);
+					var timeinminutes=parseInt(document.getElementById('timemm').value);
+					var timeinhours=parseInt(document.getElementById('timehh').value);
+					time_in_min=(timeinhours*60)+timeinminutes;
+					subtotal=mineload;;
+
+					
+				}
+				if((tabselected==2)&&(minetypeVal != 4)&&(minetypeVal != 5)){
+					var speed=parseInt(document.getElementById('mineSpeed').value);
+					var speedinmin=speed/60;
+					
+					var inittimehh=parseInt(document.getElementById('Starttimehh').value);
+					var inittimemm=parseInt(document.getElementById('Starttimemm').value);
+					var inittime_in_min=(inittimehh*60)+inittimemm;
+
+					var endtimehh=parseInt(document.getElementById('Finishtimehh').value);
+					var endtimemm=parseInt(document.getElementById('Finishtimemm').value);
+					var endtime_in_min=(endtimehh*60)+endtimemm;
+					time_in_min=endtime_in_min-inittime_in_min;
+					
+					subtotal=speedinmin*time_in_min;
+
+				}
+				
+				console.log(minetypeVal);
+				console.log(minetypeText);
+				console.log(cardType);
+				
+				
+				//create
+				
+				let row = table.insertRow(-1); // We are adding at the end
+
+				//Insert new row
+                let item = row.insertCell(0);
+				let type = row.insertCell(1);
+				let cant= row.insertCell(2);
+                let unitvalue =row.insertCell(3);
+				let munutes =row.insertCell(4);
+				let extra =row.insertCell(5);
+				let multi =row.insertCell(6);
+				let totalplusextra =row.insertCell(7);
+				let totalRow =row.insertCell(8);
+
+			
+				//Calculate values
+				
+				//multiplier
+				if (supervalue3.checked){
+					multiplier=multiplier+parseInt(supervalue3.value);
+				}
+				if (insentivegathering.checked){
+					multiplier=multiplier+parseInt(insentivegathering.value);
+				}
+				
+				if (supervalue2.checked){
+					multiplier=multiplier+parseInt(supervalue2.value);
+				}
+				
+				if (unexpectedprank.checked){
+					haveextra=true;				
+				}
+				
+				if (supervalue1.checked){
+					multiplier=multiplier+parseInt(supervalue1.value);
+				}
+				
+				//add card to multiplier
+				
+				multiplier=multiplier+cardType;
+				
+				//Gather value
+				
+				var timeinmin=0;
+				var timeinhours=0;
+				
+				if ((minetypeVal != 4)&&(minetypeVal != 5)){
+					timeinmin=time_in_min % 60;
+					timeinhours=Math.floor(time_in_min/60);
+				}
+				var points=0;
+				
+				switch (minetypeVal) {
+					case '0'://iron
+						extrarss=timeinhours*50;
+						points=ironpoints;
+						break;
+					case '1'://stone
+						extrarss=timeinhours*50;
+						points=stonepoints;
+						break;
+					case '2'://zcoins
+						points=goldpoints;
+						break;
+					case '3'://alloy
+						points=alloypoints;
+						break;
+					case '4'://baux11
+						points=bauxitepoints;
+						subtotal=bauxiteload11;
+						break;
+					case '5'://baux10
+						points=bauxitepoints;
+						subtotal=bauxiteload10;
+						break;
+					default:
+						console.log(`Sorry, we are out of ${minetypeVal}.`);
+				}
+
+				if (!haveextra){
+					extrarss=0;
+				}
+				
+				var effectiverrs=subtotal
+				subtotal=subtotal+extrarss;
+				Calcpoints=(subtotal*points*multiplier)/100;
+				CalcpointsTotal=parseInt(labtotal.innerText);
+				CalcpointsTotal=CalcpointsTotal+Calcpoints;
+		
+				
+				//Asign to table
+                item.innerHTML = itemTable;
+				type.innerHTML = minetypeText;
+                totalRow.innerHTML = parseInt(Calcpoints); 
+				cant.innerHTML=parseInt(effectiverrs);
+				unitvalue.innerHTML=parseInt(points);
+				munutes.innerHTML= timeinhours+":"+timeinmin;
+				multi.innerHTML=multiplier;
+				extra.innerHTML=parseInt(extrarss);
+				totalplusextra.innerHTML=parseInt(subtotal);
+
+				
+				item=itemTable;
+				itemTable++;
+				labtotal.innerText =CalcpointsTotal;				
+            }
+			
+			
+			function show2(){
+				document.getElementById('div1').style.display ='none';
+				document.getElementById('div2').style.display ='block';
+			}
+			function show1(){
+				document.getElementById('div1').style.display = 'block';
+				document.getElementById('div2').style.display ='none';
+			}
+			
+			
+			function selecttherest(checkboxElem) {
+				if (checkboxElem.checked) {
+					console.log("Asigno");
+					var idselec=checkboxElem.id;
+					console.log(idselec);
+					for(var i=idselec; i<6;i++){
+						console.log("dentro for"+i);
+						console.log(document.getElementById(i).id);
+						if (!(document.getElementById(i).checked))
+						{
+							console.log(i+"true");
+							document.getElementById(i).setAttribute('checked', 'checked');
+						}
+
+					}
+				} else {
+					console.log("Desasigno");
+					var idselec=checkboxElem.id;
+					console.log(idselec);
+					var idselec=checkboxElem.id;
+					for(var i=idselec; i<6;i++){
+						console.log("dentro for"+i);
+				
+						if ((document.getElementById(i).checked))
+						{
+							console.log(i+"true");
+							document.getElementById(i).removeAttribute('checked');
+						}
+						console.log(i);
+						console.log(document.getElementById(i).id);
+					}
+				}
+		}
+		
+        
+        </script>
+
+</body>
+</html>
